@@ -3,6 +3,11 @@ import os
 from prefect_azure import AzureBlobStorageCredentials
 from prefect_azure.blob_storage import AzureBlobStorageContainer
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 def create_azure_storage_creds_block():
     # First, set the environ. variable AZURE_STORAGE_CONN_STR to your 
     
