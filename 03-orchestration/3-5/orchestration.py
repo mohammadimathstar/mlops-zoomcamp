@@ -10,6 +10,8 @@ import mlflow
 import xgboost as xgb
 from prefect import flow, task
 
+from prefect_azure import AzureBlobStorageCredentials
+
 
 @task(name='Read data', retries=4, retry_delay_seconds=2)
 def read_data(filename: str) -> pd.DataFrame:
@@ -111,7 +113,7 @@ def train_best_model(
     return None
 
 
-@flow(name="NYC model")
+@flow(name="NYC model", log_prints=True)
 def main_flow(
     train_path: str = "./data/green_tripdata_2024-01.parquet",
     val_path: str = "./data/green_tripdata_2024-02.parquet",
@@ -122,7 +124,17 @@ def main_flow(
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("nyc-taxi-experiment1")
 
+    # Copy the files from azure blob storage in the local path
+    # Load block
+    print("Download files from azure storage blob!")
+    azure_blob_block = AzureBlobStorageCredentials.load("blob-example")
+    azure_blob_block.download_folder_to_path(
+        from_folder='nyc_taxi',
+        to_folder='data',
+    )
+
     # Load
+    print("Load files!")
     df_train = read_data(train_path)
     df_val = read_data(val_path)
 
