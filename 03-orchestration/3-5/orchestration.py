@@ -10,7 +10,7 @@ import mlflow
 import xgboost as xgb
 from prefect import flow, task
 
-from prefect_azure import AzureBlobStorageCredentials
+from prefect_azure import AzureBlobStorageContainer
 
 
 @task(name='Read data', retries=4, retry_delay_seconds=2)
@@ -127,7 +127,7 @@ def main_flow(
     # Copy the files from azure blob storage in the local path
     # Load block
     print("Download files from azure storage blob!")
-    azure_blob_block = AzureBlobStorageCredentials.load("blob-example")
+    azure_blob_block = AzureBlobStorageContainer.load("blob-example")
     azure_blob_block.download_folder_to_path(
         from_folder='nyc_taxi',
         to_folder='data',
